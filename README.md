@@ -7,3 +7,6 @@ CONDITIONS
    review files if they look as expected remove manually folder new_set and folder backup and folder is redy to push. 
 4. If you are not satisfied with the generated set of files - use option 4 which will reverse all changes and you can start over again from option 2. 
 
+OPTION 1 can be used to find any string contained in all files in the folder declaring how many times string is appearing in it:
+0 -> more then 0 (script will print all files containing at least 1 searched string (1 or more))
+1 -> more then 1 and so on...
