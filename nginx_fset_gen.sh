@@ -29,24 +29,13 @@ function mismatch_finder() {
 	echo "MISMATCH FINDER"
     echo "-------------"
 	echo "This script lists files where server_name is different then file (domain) name"
-    #read searched_str
-    #echo "ocurring more then how many times in the file?"
-    #read number_of_times
         for file in $( ls ); do
         FILE_NAME=$file
         DOMAIN=${FILE_NAME%.conf}
-        SERVER="$(grep -m 1 "server_name" $FILE_NAME)" #getting file name
-        SERVER2=${SERVER//[[:blank:]]/}                #removing spaces, tabs
-        SERVER3=${SERVER2:11}                          #removing server_name string
-        SERVER4=${SERVER3%;}                           #removing ; from the end
-        if [[ "$FILE_NAME" == *".conf" ]] && ! grep -q "$DOMAIN" <<< "$SERVER" && [[ "$FILE_NAME" != "template.conf" ]]; then
-        echo "MISMATCH: $DOMAIN | $SERVER"
-        echo "$SERVER"
-        echo "$SERVER2"
-        echo "$SERVER3"
-        echo "$SERVER4"
-
-        fi
+        SERVER="$(grep -m 1 "server_name" $FILE_NAME)" 
+            if [[ "$FILE_NAME" == *".conf" ]] && ! grep -q "$DOMAIN" <<< "$SERVER" && [[ "$FILE_NAME" != "template.conf" ]]; then
+                echo "MISMATCH: $DOMAIN | $SERVER"
+            fi
         done
 }
 
@@ -69,9 +58,10 @@ function file_set_gen() {
             echo "$DOMAIN"
             SSL_CERT=$(grep -m 1 "ssl_certificate" $FILE_NAME)
             SSL_CERT_KEY=$(grep -m 1 "ssl_certificate_key" $FILE_NAME)
-            SERVER="$(grep -m 1 "server_name" $FILE_NAME)" #getting file name
+            SSL_DHPARAM=$(grep -m 1 "ssl_dhparam" $FILE_NAME)
+            SERVER="$(grep -m 1 "server_name" $FILE_NAME)" #getting server_name line
             SERVER2=${SERVER//[[:blank:]]/}                #removing spaces, tabs
-            SERVER3=${SERVER2:11}                          #removing server_name string
+            SERVER3=${SERVER2:11}                          #removing 'server_name' string
             SERVER_NAME=${SERVER3%;}                       #removing ; from the end
             echo "$SSL_CERT"
             echo "$SSL_CERT_KEY"
@@ -82,6 +72,10 @@ function file_set_gen() {
             sed -i '' "s|{{SSL_CERTIFICATE}}|$SSL_CERT|" "new_set/$file"
             sed -i '' "s|{{SSL_CERTIFICATE_KEY}}|$SSL_CERT_KEY|" "new_set/$file"
             sed -i '' "s|{{CLUSTER}}|$CLUSTER|" "new_set/$file"
+            if  [[ "$SSL_DHPARAM" != "" ]]; then
+            sed -i '' "s|{{SSL_DHPARAM}}|$SSL_DHPARAM|" "new_set/$file"
+            fi
+            sed -i '' '/{{SSL_DHPARAM}}/d' "new_set/$file"
 
         fi 
     done
