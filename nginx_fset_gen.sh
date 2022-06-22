@@ -66,7 +66,8 @@ function file_set_gen() {
             echo "$SSL_CERT"
             echo "$SSL_CERT_KEY"
             echo "$SERVER_NAME"
-            cat template.conf > new_set/$file
+            echo "$SSL_DHPARAM"
+            cat template > new_set/$file
             sed -i '' "s/{{SERVER_NAME}}/$SERVER_NAME/g" "new_set/$file"
             sed -i '' "s/{{DOMAIN}}/$DOMAIN/g" "new_set/$file"
             sed -i '' "s|{{SSL_CERTIFICATE}}|$SSL_CERT|" "new_set/$file"
