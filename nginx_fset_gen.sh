@@ -24,6 +24,24 @@ function string_finder() {
         done
 }
 
+function mismatch_finder() {
+    echo ""
+	echo "MISMATCH FINDER"
+    echo "-------------"
+	echo "This script lists files where server_name is different then file (domain) name"
+    #read searched_str
+    #echo "ocurring more then how many times in the file?"
+    #read number_of_times
+        for file in $( ls ); do
+        FILE_NAME=$file
+        DOMAIN=${FILE_NAME%.conf}
+        SERVER="$(grep -m 1 "server_name" $FILE_NAME)" 
+        if [[ "$FILE_NAME" == *".conf" ]] && ! grep -q "$DOMAIN" <<< "$SERVER" && [[ "$FILE_NAME" != "template.conf" ]]; then
+        echo "MISMATCH: $DOMAIN | $SERVER"
+        fi
+        done
+}
+
 function file_set_gen() {
 	echo "FILES GENERATOR"
     echo "---------------"
@@ -128,6 +146,7 @@ $(ColorGreen '1)') String finder
 $(ColorGreen '2)') Files generator
 $(ColorGreen '3)') Files crossover
 $(ColorGreen '4)') Files rollback
+$(ColorGreen '5)') Server names mismatch finder
 $(ColorGreen '0)') Exit
 $(ColorBlue 'Choose an option:') "
         read a
@@ -136,6 +155,7 @@ $(ColorBlue 'Choose an option:') "
 	        2) file_set_gen ; menu ;;
 	        3) replace_files ; menu ;;
 	        4) files_rollback ; menu ;;
+            5) mismatch_finder ; menu ;;
 		0) exit 0 ;;
 		*) echo -e $red"Wrong option."$clear; menu;;
         esac
