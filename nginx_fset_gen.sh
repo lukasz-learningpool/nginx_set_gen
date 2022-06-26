@@ -86,6 +86,49 @@ function file_set_gen() {
     echo "If you want to replace original files with new set use option 3 !!"
 }
 
+function add_line() {
+	echo "Add line to all files"
+    echo "---------------"
+    echo "This script is to generate new set of nginx configs in new_set folder nested in current folder which is:"
+    echo $(pwd)
+    echo "with new line added after defined line"
+    echo "Are you sure you want to add line to the files? (y/n)"
+    read DECISION
+        if [[ "$DECISION" == "y" ]]; then
+            echo "Input the line after which you want to add a new line?"
+            read AFTER_LINE
+            #echo "Input the line you want to add"
+            #IFS= read NEW_LINE
+            IFS= read -r -p "Input the line you want to add: " NEW_LINE
+            mkdir new_set
+            #looping
+                for file in $( ls ); do
+                    FILE_NAME=$file
+                     if [[ "$FILE_NAME" == *".conf" ]]; then
+                        echo "Adding new line to $FILE_NAME"
+                        echo "------------------------------------------"
+                        #cat $file > new_set/$file
+                        #gsed -i "/$AFTER_LINE/a $NEW_LINE" "new_set/$file"
+                        input="$file"
+                            IFS=''
+                            while read -r line
+                            do
+                                echo $line
+                                echo $line >> new_set/$file
+                                    if [[ "$line" == *"$AFTER_LINE"* ]]; then
+                                        echo $NEW_LINE >> new_set/$file
+                                    fi
+                            done < "$input"
+                     fi 
+                done
+        fi
+    echo "---------------------------------------"
+    echo "New set of conf files has been generated and stored in subfolder new_set"
+    echo "If you want to replace original files with new set use option 3 !!"
+}
+
+
+
 function replace_files() {
     echo ""
 	echo "REPLACING FILES"
@@ -157,6 +200,7 @@ $(ColorGreen '2)') Files generator
 $(ColorGreen '3)') Files crossover
 $(ColorGreen '4)') Files rollback
 $(ColorGreen '5)') Server names mismatch finder
+$(ColorGreen '6)') Add new line to all files
 $(ColorGreen '0)') Exit
 $(ColorBlue 'Choose an option:') "
         read a
@@ -166,6 +210,7 @@ $(ColorBlue 'Choose an option:') "
 	        3) replace_files ; menu ;;
 	        4) files_rollback ; menu ;;
             5) mismatch_finder ; menu ;;
+            6) add_line ; menu ;;
 		0) exit 0 ;;
 		*) echo -e $red"Wrong option."$clear; menu;;
         esac
