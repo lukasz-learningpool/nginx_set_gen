@@ -95,7 +95,7 @@ function file_set_gen() {
             sed -i '' "s|{{SSL_CERTIFICATE}}|$SSL_CERT|" "new_set/$file"
             sed -i '' "s|{{SSL_CERTIFICATE_KEY}}|$SSL_CERT_KEY|" "new_set/$file"
             sed -i '' "s|{{CLUSTER}}|$CLUSTER|" "new_set/$file"
-            sed -i '' "s|{{SITEDATA}|$SITEDATA|" "new_set/$file"
+            sed -i '' "s|{{SITEDATA}}|$SITEDATA|" "new_set/$file"
             #if  [[ "$SSL_DHPARAM" != "" ]]; then
             #sed -i '' "s|{{SSL_DHPARAM}}|$SSL_DHPARAM|" "new_set/$file"
             #fi
