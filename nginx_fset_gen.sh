@@ -39,6 +39,21 @@ function mismatch_finder() {
         done
 }
 
+function mismatch_finder_2() {
+    echo ""
+	echo "MISMATCH FINDER"
+    echo "-------------"
+	echo "This script lists files where maintenance location is different then file (domain) name"
+        for file in $( ls ); do
+        FILE_NAME=$file
+        DOMAIN=${FILE_NAME%.conf}
+        SITEDATA="$(grep -m 1 "sitedata" $FILE_NAME)" 
+            if [[ "$FILE_NAME" == *".conf" ]] && ! grep -q "$DOMAIN" <<< "$SITEDATA" && [[ "$FILE_NAME" != "template.conf" ]]; then
+                echo "MISMATCH: $DOMAIN | $SITEDATA"
+            fi
+        done
+}
+
 function file_set_gen() {
 	echo "FILES GENERATOR"
     echo "---------------"
@@ -53,7 +68,7 @@ function file_set_gen() {
         FILE_NAME=$file
         if [[ "$FILE_NAME" == *".conf" ]]; then
             echo "Generating file for $FILE_NAME"
-            variable="$(grep -m 1 "server_name" $FILE_NAME)"
+            #variable="$(grep -m 1 "server_name" $FILE_NAME)"
             DOMAIN=${FILE_NAME%.conf}
             echo "$DOMAIN"
             ROOT=$(grep -m 1 "root /" $FILE_NAME)
@@ -61,10 +76,11 @@ function file_set_gen() {
             SSL_CERT_KEY=$(grep -m 1 "ssl_certificate_key" $FILE_NAME)
             #SSL_DHPARAM=$(grep -m 1 "ssl_dhparam" $FILE_NAME)
             SERVER="$(grep -m 1 "server_name" $FILE_NAME)" #getting server_name line
-            SERVER2=`echo $SERVER | sed 's/ *$//g'`
+            SERVER2=`echo $SERVER | sed 's/ *$//g'`        #removing trailing spaces"
             echo "|$SERVER2|"
+            echo "|$ROOT|"
             #SERVER2=${SERVER//[[:blank:]]/}                #removing spaces, tabs
-            SERVER3=${SERVER2:11}                          #removing 'server_name' string
+            SERVER3=${SERVER2:12}                          #removing 'server_name' string
             SERVER_NAME=${SERVER3%;}                       #removing ; from the end
             echo "$SSL_CERT"
             echo "$SSL_CERT_KEY"
@@ -73,6 +89,7 @@ function file_set_gen() {
             #echo "$SSL_DHPARAM"
             cat template > new_set/$file
             sed -i '' "s/{{SERVER_NAME}}/$SERVER_NAME/g" "new_set/$file"
+            sed -i '' "s|{{ROOT}}|$ROOT|g" "new_set/$file"
             sed -i '' "s/{{DOMAIN}}/$DOMAIN/g" "new_set/$file"
             sed -i '' "s|{{SSL_CERTIFICATE}}|$SSL_CERT|" "new_set/$file"
             sed -i '' "s|{{SSL_CERTIFICATE_KEY}}|$SSL_CERT_KEY|" "new_set/$file"
@@ -80,7 +97,7 @@ function file_set_gen() {
             #if  [[ "$SSL_DHPARAM" != "" ]]; then
             #sed -i '' "s|{{SSL_DHPARAM}}|$SSL_DHPARAM|" "new_set/$file"
             #fi
-            sed -i '' '/{{SSL_DHPARAM}}/d' "new_set/$file"
+            #sed -i '' '/{{SSL_DHPARAM}}/d' "new_set/$file"
 
         fi 
     done
@@ -204,6 +221,7 @@ $(ColorGreen '3)') Files crossover
 $(ColorGreen '4)') Files rollback
 $(ColorGreen '5)') Server names mismatch finder
 $(ColorGreen '6)') Add new line to all files
+$(ColorGreen '7)') Sitedata mismatch finder
 $(ColorGreen '0)') Exit
 $(ColorBlue 'Choose an option:') "
         read a
@@ -214,6 +232,7 @@ $(ColorBlue 'Choose an option:') "
 	        4) files_rollback ; menu ;;
             5) mismatch_finder ; menu ;;
             6) add_line ; menu ;;
+            7) mismatch_finder_2 ; menu ;;
 		0) exit 0 ;;
 		*) echo -e $red"Wrong option."$clear; menu;;
         esac
