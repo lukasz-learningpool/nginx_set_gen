@@ -199,10 +199,12 @@ function file_compare() {
 	echo "FILES COMPARE"
     echo "---------------"
     echo "This script is to compare key elements in new set of nginx configs to the source"
+    COUNTER=0
     #looping
     for file in $( ls ); do
         FILE_NAME=$file
         if [[ "$FILE_NAME" == *".conf" ]]; then
+            let COUNTER++
             echo "Comparing file  $FILE_NAME"
             SERVER=`echo $(grep -m 1 "server_name" $FILE_NAME) | sed 's/ *$//g'` 
             ROOT=`echo $(grep -m 1 "root /" $FILE_NAME) | sed 's/ *$//g'`
@@ -259,7 +261,7 @@ function file_compare() {
         fi 
     done
     echo "---------------------------------------"
-    echo "FINISHED"
+    echo "FINISHED, checked files: $COUNTER""
 }
 
 
