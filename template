@@ -7,7 +7,7 @@ server {
     server_name {{SERVER_NAME}};
 
     # Path to document root
-    root /www{{CLUSTER}}/t2sites/{{DOMAIN}}/wwwroot;
+{{ROOT}}
 
     # Paths to certificate files.
 {{SSL_CERTIFICATE}}

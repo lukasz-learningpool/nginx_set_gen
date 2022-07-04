@@ -56,11 +56,14 @@ function file_set_gen() {
             variable="$(grep -m 1 "server_name" $FILE_NAME)"
             DOMAIN=${FILE_NAME%.conf}
             echo "$DOMAIN"
+            ROOT=$(grep -m 1 "root /" $FILE_NAME)
             SSL_CERT=$(grep -m 1 "ssl_certificate" $FILE_NAME)
             SSL_CERT_KEY=$(grep -m 1 "ssl_certificate_key" $FILE_NAME)
-            SSL_DHPARAM=$(grep -m 1 "ssl_dhparam" $FILE_NAME)
+            #SSL_DHPARAM=$(grep -m 1 "ssl_dhparam" $FILE_NAME)
             SERVER="$(grep -m 1 "server_name" $FILE_NAME)" #getting server_name line
-            SERVER2=${SERVER//[[:blank:]]/}                #removing spaces, tabs
+            SERVER2=`echo $SERVER | sed 's/ *$//g'`
+            echo "|$SERVER2|"
+            #SERVER2=${SERVER//[[:blank:]]/}                #removing spaces, tabs
             SERVER3=${SERVER2:11}                          #removing 'server_name' string
             SERVER_NAME=${SERVER3%;}                       #removing ; from the end
             echo "$SSL_CERT"
