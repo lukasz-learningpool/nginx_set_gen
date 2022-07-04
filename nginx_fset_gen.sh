@@ -193,6 +193,75 @@ function files_rollback() {
     fi
 }
 
+function file_compare() {
+	echo "FILES COMPARE"
+    echo "---------------"
+    echo "This script is to compare key elements in new set of nginx configs to the source"
+    #looping
+    for file in $( ls ); do
+        FILE_NAME=$file
+        if [[ "$FILE_NAME" == *".conf" ]]; then
+            echo "Comparing file  $FILE_NAME"
+            SERVER=`echo $(grep -m 1 "server_name" $FILE_NAME) | sed 's/ *$//g'` 
+            ROOT=`echo $(grep -m 1 "root /" $FILE_NAME) | sed 's/ *$//g'`
+            SSL_CERT=`echo $(grep -m 1 "ssl_certificate" $FILE_NAME) | sed 's/ *$//g'`
+            SSL_CERT_KEY=`echo $(grep -m 1 "ssl_certificate_key" $FILE_NAME) | sed 's/ *$//g'`
+            ACCESS_LOG=`echo $(grep -m 1 "access_log" $FILE_NAME) | sed 's/ *$//g'`
+            ERROR_LOG=`echo $(grep -m 1 "error_log" $FILE_NAME) | sed 's/ *$//g'`
+            SITEDATA=`echo $(grep -m 1 "sitedata" $FILE_NAME) | sed 's/ *$//g'`
+            cd new_set
+            SERVER2=`echo $(grep -m 1 "server_name" $FILE_NAME) | sed 's/ *$//g'` 
+            ROOT2=`echo $(grep -m 1 "root /" $FILE_NAME) | sed 's/ *$//g'`
+            SSL_CERT2=`echo $(grep -m 1 "ssl_certificate" $FILE_NAME) | sed 's/ *$//g'`
+            SSL_CERT_KEY2=`echo $(grep -m 1 "ssl_certificate_key" $FILE_NAME) | sed 's/ *$//g'`
+            ACCESS_LOG2=`echo $(grep -m 1 "access_log" $FILE_NAME) | sed 's/ *$//g'`
+            ERROR_LOG2=`echo $(grep -m 1 "error_log" $FILE_NAME) | sed 's/ *$//g'`
+            SITEDATA2=`echo $(grep -m 1 "sitedata" $FILE_NAME) | sed 's/ *$//g'`
+            cd ..
+            if [[ "$SERVER" != "$SERVER2" ]]; then
+            echo "Servers NO match:"
+            echo "$SERVER"
+            echo "$SERVER2"
+            fi
+            if [[ "$ROOT" != "$ROOT2" ]]; then
+            echo "ROOT NO match:"
+            echo "$ROOT"
+            echo "$ROOT2"
+            fi
+            if [[ "$SSL_CERT" != "$SSL_CERT2" ]]; then
+            echo "SSL_CERT NO match:"
+            echo "$SSL_CERT"
+            echo "$SSL_CERT2"
+            fi
+            if [[ "$SSL_CERT_KEY" != "$SSL_CERT_KEY2" ]]; then
+            echo "SSL_CERT_KEY NO match:"
+            echo "$SSL_CERT_KEY"
+            echo "$SSL_CERT_KEY2"
+            fi
+            if [[ "$ACCESS_LOG" != "$ACCESS_LOG2" ]]; then
+            echo "ACCESS_LOG NO match:"
+            echo "$ACCESS_LOG"
+            echo "$ACCESS_LOG2"
+            fi
+            if [[ "$ERROR_LOG" != "$ERROR_LOG2" ]]; then
+            echo "ERROR_LOGS NO match:"
+            echo "$ERROR_LOG"
+            echo "$ERROR_LOG2"
+            fi
+            if [[ "$SITEDATA" != "$SITEDATA2" ]]; then
+            echo "SITEDATA NO match:"
+            echo "$SITEDATA"
+            echo "$SITEDATA2"
+            fi
+            echo "------------------------------------------"            
+        fi 
+    done
+    echo "---------------------------------------"
+    echo "FINISHED"
+}
+
+
+
 ##
 # Color  Variables
 ##
@@ -222,6 +291,7 @@ $(ColorGreen '4)') Files rollback
 $(ColorGreen '5)') Server names mismatch finder
 $(ColorGreen '6)') Add new line to all files
 $(ColorGreen '7)') Sitedata mismatch finder
+$(ColorGreen '8)') Compare new set with source
 $(ColorGreen '0)') Exit
 $(ColorBlue 'Choose an option:') "
         read a
@@ -233,6 +303,7 @@ $(ColorBlue 'Choose an option:') "
             5) mismatch_finder ; menu ;;
             6) add_line ; menu ;;
             7) mismatch_finder_2 ; menu ;;
+            8) file_compare ; menu ;;
 		0) exit 0 ;;
 		*) echo -e $red"Wrong option."$clear; menu;;
         esac
