@@ -32,7 +32,7 @@ server {
     }
 
     location ~ /maintenance/ {
-{{SITEDATA}}
+        root /www{{CLUSTER}}/t2sites/{{DOMAIN}}/sitedata/;
         rewrite ^/.*(/maintenance/.*)$ $1 break;
     }
 
