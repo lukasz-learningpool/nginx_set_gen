@@ -18,8 +18,8 @@ function string_finder() {
                 i=$((i+1))  
                 done < $file
             if [ $count -gt $number_of_times ]; then
-                echo "F O U N D:"
-                echo "$file | $count"
+                #echo "F O U N D:"
+                echo "$file"
             fi
         done
 }
@@ -82,7 +82,6 @@ function file_set_gen() {
             #SERVER2=${SERVER//[[:blank:]]/}                #removing spaces, tabs
             SERVER3=${SERVER2:12}                          #removing 'server_name' string
             SERVER_NAME=${SERVER3%;}                       #removing ; from the end
-            SITEDATA="$(grep -m 1 "sitedata" $FILE_NAME)"
             echo "$SSL_CERT"
             echo "$SSL_CERT_KEY"
             echo "$SERVER_NAME"
@@ -95,7 +94,6 @@ function file_set_gen() {
             sed -i '' "s|{{SSL_CERTIFICATE}}|$SSL_CERT|" "new_set/$file"
             sed -i '' "s|{{SSL_CERTIFICATE_KEY}}|$SSL_CERT_KEY|" "new_set/$file"
             sed -i '' "s|{{CLUSTER}}|$CLUSTER|" "new_set/$file"
-            sed -i '' "s|{{SITEDATA}}|$SITEDATA|" "new_set/$file"
             #if  [[ "$SSL_DHPARAM" != "" ]]; then
             #sed -i '' "s|{{SSL_DHPARAM}}|$SSL_DHPARAM|" "new_set/$file"
             #fi
@@ -199,12 +197,10 @@ function file_compare() {
 	echo "FILES COMPARE"
     echo "---------------"
     echo "This script is to compare key elements in new set of nginx configs to the source"
-    COUNTER=0
     #looping
     for file in $( ls ); do
         FILE_NAME=$file
         if [[ "$FILE_NAME" == *".conf" ]]; then
-            let COUNTER++
             echo "Comparing file  $FILE_NAME"
             SERVER=`echo $(grep -m 1 "server_name" $FILE_NAME) | sed 's/ *$//g'` 
             ROOT=`echo $(grep -m 1 "root /" $FILE_NAME) | sed 's/ *$//g'`
@@ -213,7 +209,7 @@ function file_compare() {
             ACCESS_LOG=`echo $(grep -m 1 "access_log" $FILE_NAME) | sed 's/ *$//g'`
             ERROR_LOG=`echo $(grep -m 1 "error_log" $FILE_NAME) | sed 's/ *$//g'`
             SITEDATA=`echo $(grep -m 1 "sitedata" $FILE_NAME) | sed 's/ *$//g'`
-            cd new_set
+            cd backup
             SERVER2=`echo $(grep -m 1 "server_name" $FILE_NAME) | sed 's/ *$//g'` 
             ROOT2=`echo $(grep -m 1 "root /" $FILE_NAME) | sed 's/ *$//g'`
             SSL_CERT2=`echo $(grep -m 1 "ssl_certificate" $FILE_NAME) | sed 's/ *$//g'`
@@ -261,7 +257,7 @@ function file_compare() {
         fi 
     done
     echo "---------------------------------------"
-    echo "FINISHED, checked files: $COUNTER""
+    echo "FINISHED"
 }
 
 
